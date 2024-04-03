@@ -1,0 +1,9 @@
+# ignore file and folder list
+/.venv
+/data
+/vector_store
+/sample_streamlit
+/model/embeddings/__pycache__
+/model/__pycache__
+*.txt
+.env
