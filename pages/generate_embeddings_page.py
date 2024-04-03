@@ -26,7 +26,8 @@ def main():
     # upload a PDF file
     pdfs = st.file_uploader("Upload your PDF", type = 'pdf', accept_multiple_files = True)
     
-    input_url = st.text_input("Enter Url")
+    # input_url = st.text_input("Enter Url")
+    input_url = ""
     
     input_sitemap = st.text_input("Enter Sitemap Url")
     

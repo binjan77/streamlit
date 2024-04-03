@@ -1,0 +1,51 @@
+# 1. Install VSCode and Python 3.12
+# install python extension for VSCode
+# Python v2024.2.1
+# Python Debugger v2024.2.0
+# Python Extension Pack v1.7.0
+# Python Environment Management v1.2.4
+# restart VSCode 
+
+# 2. create environment
+# option 1:
+# open View => Command Palette... => Python: Create Environment
+# Select Venv Creates a '.venv' virtual environement in the current workspace
+# Select Python 3.11.0 64-bit C:\Python\Python311\python.ex (Path where Python v3.11 is installed) 
+# View => Command Palette... =>; Python:Select Interpreter => Enter Interpretr path
+# => Find... => \.venv\Scripts\python.exe
+# option 2:
+# terminal => python -m venv <project folder path>
+# Ctrl + Shift + P; Python:Select Interpreter => Enter Interpreter path
+# => Find... => \venv\Scripts\python.exe
+
+# 3. activate environment 
+# terminal window with project path 
+# write .\.venv\Scripts\activate.ps1
+# this will activate environment (.venv)
+
+# 4. use pip install for each package individual
+#pip install -r require_packages.txt
+
+# or
+
+#pip install streamlit
+#pip install streamlit-extras
+#pip install python-dotenv
+#pip install pdfminer.six
+#pip install langchain==0.1.6
+#pip install langchain-community==0.0.19
+#pip install langchain-openai==0.0.6
+#pip install tiktoken==0.6.0
+#pip install openai
+#pip install swig
+#pip install faiss-cpu
+
+# 5. create .env file on root 
+# add following keys with value
+# OPENAI_API_KEY=
+# OPENAI_API_MODEL=
+# chunk_size=
+# chunk_overlap=
+
+# 5. run app
+#streamlit run .\app.py
