@@ -12,8 +12,8 @@ from model.vector import vector_db
 from model.upload_file import upload_file
 
 class pdf_huggigface_token_embeddings:   
-    __directory = r"./data/"
-    __embedding_model_name = "text-embedding-3-large"
+    __directory = os.environ["upload_file_directory"]
+    __embedding_model_name = os.environ["upload_file_directory"]
     
     # Instance attribute 
     def __init__(self, name): 

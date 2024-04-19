@@ -1,19 +1,38 @@
 import streamlit as st
 
 from model.embeddings.pdf import pdf_embeddings
-from model.embeddings.html import html_embeddings
-from model.embeddings.sitemap import sitemap_embeddings         
+from model.embeddings.sitemap import sitemap_embeddings  
+from model.embeddings.html import html_embeddings       
    
-def generate_embeddings(pdfs, input_url, input_sitemap):
-    # # generate embedding for PDFs
-    obj_pdf_embeddings = pdf_embeddings('pdf')
-    obj_pdf_embeddings.generate_pdf_embeddings(pdfs)
-    # generate embedding for HTML (NOT DONE)
-    # obj_html_embeddings = html_embeddings('html')
-    # obj_html_embeddings.generate_html_embeddings(input_url)
-    # generate embedding for sitemap
-    obj_sitemap_embeddings = sitemap_embeddings('sitemap')
-    obj_sitemap_embeddings.generate_sitemap_embeddings(input_sitemap)
+def generate_embeddings():
+    # get file_uploader widget
+    pdfs = st.session_state.file_upload_widget
+    # if file is selected
+    if pdfs is not None:
+        # # generate embedding for PDFs
+        obj_pdf_embeddings = pdf_embeddings('pdf')
+        success = obj_pdf_embeddings.generate_pdf_embeddings(pdfs)
+        # embeddings are generated
+        if success:
+            st.write('FAISS index is generated for PDFs.')
+        
+    # get text_input widget
+    input_sitemap = st.session_state.sitemap_widget
+    # if sitemap url is entered
+    if input_sitemap !=  "":
+        # generate embedding for sitemap
+        obj_sitemap_embeddings = sitemap_embeddings('sitemap')
+        success = obj_sitemap_embeddings.generate_sitemap_embeddings(input_sitemap)
+        # embeddings are generated
+        if success:
+            st.write('FAISS index is generated for Sitemap.')
+       
+    # input_url = st.session_state.url_widget
+    # # if url is entered 
+    # if input_url !=  "":    
+    #     # generate embedding for HTML (NOT DONE)
+    #     obj_html_embeddings = html_embeddings('html')
+    #     obj_html_embeddings.generate_html_embeddings(input_url)
 
 # Sidebar contents
 with st.sidebar:
@@ -23,15 +42,16 @@ with st.sidebar:
 
 def main():
     st.header("Embeddings </>")
-    # upload a PDF file
-    pdfs = st.file_uploader("Upload your PDF", type = 'pdf', accept_multiple_files = True)
     
-    # input_url = st.text_input("Enter Url")
-    input_url = ""
-    
-    input_sitemap = st.text_input("Enter Sitemap Url")
-    
-    st.button("Generate Embeddings", on_click = generate_embeddings, args = (pdfs, input_url, input_sitemap))
-        
+    with st.form("sag-rag-form", clear_on_submit = True, border = False):
+        # upload a PDF file
+        st.file_uploader("Upload your PDF", type = 'pdf', key = 'file_upload_widget', accept_multiple_files = True)
+        # sitemap
+        st.text_input("Enter Sitemap Url", key = 'sitemap_widget')
+        # # HTML Url
+        # st.text_input("Enter Url", key = 'url_widget')
+        # submit button
+        st.form_submit_button("Generate Embeddings", on_click = generate_embeddings)
+       
 if __name__ ==  '__main__':
     main()

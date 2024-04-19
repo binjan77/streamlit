@@ -42,10 +42,12 @@
 
 # 5. create .env file on root 
 # add following keys with value
-# OPENAI_API_KEY=
-# OPENAI_API_MODEL=
-# chunk_size=
-# chunk_overlap=
+#OPENAI_API_KEY=
+#OPENAI_API_MODEL=text-embedding-3-large
+#chunk_size=2000
+#chunk_overlap=200
+#vector_store_directory=./vector_store/
+#upload_file_directory=./data/
 
-# 5. run app
+# 6. run app
 #streamlit run .\app.py

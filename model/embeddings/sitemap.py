@@ -29,8 +29,14 @@ class sitemap_embeddings:
                 # get chunks from sitemap url
                 chunks = self.read_and_textify_docs(docs)
                 obj_faiss_vector_db.save_vector_db(store_name, chunks)
+                # return true as all the process is completed successfully
+                return True
             else:
-                st.write("Sitemap: FAISS index is exists.")
+                st.write(f"Sitemap: {input_sitemap}, FAISS index is exists.")  
+                # return true as all the process is completed successfully
+                return False      
+        else:    
+            return False
                
     def get_store_name(self, input_sitemap):                        
         # length of the input string
