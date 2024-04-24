@@ -3,6 +3,8 @@ import streamlit as st
 from model.embeddings.pdf import pdf_embeddings
 from model.embeddings.sitemap import sitemap_embeddings  
 from model.embeddings.html import html_embeddings       
+
+from widget.st_sidebar import sidebar
    
 def generate_embeddings():
     # get file_uploader widget
@@ -34,14 +36,9 @@ def generate_embeddings():
     #     obj_html_embeddings = html_embeddings('html')
     #     obj_html_embeddings.generate_html_embeddings(input_url)
 
-# Sidebar contents
-with st.sidebar:
-    st.sidebar.page_link("app.py", label = "App")
-    st.sidebar.page_link("pages/generate_embeddings_page.py", label = "Generate Embeddings")
-    st.sidebar.page_link("pages/chat_page.py", label = "Chat")
-
 def main():
-    st.header("Embeddings </>")
+    sidebar()
+    st.markdown("**Upload a PDF or a website URL to generate embeddings for the content. These embeddings will be used for retrieving relevant information when chatting with the chatbot.**")
     
     with st.form("sag-rag-form", clear_on_submit = True, border = False):
         # upload a PDF file

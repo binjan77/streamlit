@@ -1,13 +1,10 @@
 import streamlit as st
       
-# Sidebar contents
-with st.sidebar:
-    st.sidebar.page_link("app.py", label = "App")
-    st.sidebar.page_link("pages/generate_embeddings_page.py", label = "Generate Embeddings")
-    st.sidebar.page_link("pages/chat_page.py", label = "Chat")
+from widget.st_sidebar import sidebar
 
 def main():
-    st.header("App 💬")
+    sidebar()
+    st.markdown("**Introducing our internal chatbot app designed specifically for Software AG employees! This smart assistant is your go-to for quick answers, IT support, and company information. Powered by AI, it streamlines communication, boosts productivity, and enhances employee experience within the organization.**")
 
 if __name__ ==  '__main__':
     main()

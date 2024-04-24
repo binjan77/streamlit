@@ -9,6 +9,8 @@ import streamlit as st
 import os as os
 import json 
 
+from widget.st_sidebar import sidebar
+
 ###################################################################
 load_dotenv() # read local .env file
 ###################################################################
@@ -118,15 +120,10 @@ def question_answer():
         # search for similarities
         search_similarities(st.session_state.question_answer)
         
-# Sidebar contents
-with st.sidebar:
-    st.sidebar.page_link("app.py", label = "App")
-    st.sidebar.page_link("pages/generate_embeddings_page.py", label = "Generate Embeddings")
-    st.sidebar.page_link("pages/chat_page.py", label = "Chat")
-
 def main():
     if __vector_db:
-        st.header("Chat 💬")
+        sidebar()
+        st.markdown("**Welcome to our internal chatbot app, tailored for Software AG employees! Find answers to your questions here.**")
         # show UI for ask questions
         question_answer()
     else:

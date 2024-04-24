@@ -5,4 +5,5 @@
 /sample_streamlit
 /model/embeddings/__pycache__
 /model/__pycache__
+/widget/__pycache__
 .env
