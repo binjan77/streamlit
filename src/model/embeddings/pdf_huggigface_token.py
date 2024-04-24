@@ -18,7 +18,8 @@ class pdf_huggigface_token_embeddings:
     # Instance attribute 
     def __init__(self, name): 
         self.name = name 
-         
+    
+    # function to generate pdf embeddings using hugging face        
     def generate_pdf_huggingface_embeddings(self, pdfs):
         # if file is selected
         if pdfs is not None:
@@ -36,6 +37,7 @@ class pdf_huggigface_token_embeddings:
                     faiss_vector_db = vector_db("faiss") 
                     faiss_vector_db.save_vector_db(store_name, chunks)     
 
+    # function to read and textify pdf   
     def read_and_textify_pdf(self, pdf):
         # concate pdf path
         pdf_path = os.path.join(self.__directory, pdf.name)

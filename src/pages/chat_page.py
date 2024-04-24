@@ -121,8 +121,9 @@ def question_answer():
         search_similarities(st.session_state.question_answer)
         
 def main():
+    sidebar()
+    
     if __vector_db:
-        sidebar()
         st.markdown("**Welcome to our internal chatbot app, tailored for Software AG employees! Find answers to your questions here.**")
         # show UI for ask questions
         question_answer()

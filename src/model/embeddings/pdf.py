@@ -19,7 +19,8 @@ class pdf_embeddings:
         load_dotenv() 
         # set upload directory path
         self.__directory = os.environ["upload_file_directory"]
-         
+      
+    # function to generate pdf embeddings   
     def generate_pdf_embeddings(self, pdfs):
         # if file is selected
         if pdfs is not None:
@@ -52,7 +53,8 @@ class pdf_embeddings:
                     return False
         else:
             return False
-        
+     
+    # function to read and textify pdf   
     def read_and_textify_pdf(self, pdf):
         try:
             # concate pdf path

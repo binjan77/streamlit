@@ -14,18 +14,20 @@ class html_embeddings:
     # Instance attribute 
     def __init__(self, name): 
         self.name = name 
-        
+       
+    # function to generate html embeddings 
     def generate_html_embeddings(self, input_url):
         if input_url !=  "":
             # vector store name
-            store_name = get_store_name(input_url)
+            # store_name = self.get_store_name(input_url)
             # get chunks from uploaded file
             chunks = self.read_and_textify_html_urllib3(input_url)
             st.write(chunks)
             # # generate embeddings
             # faiss_vector_db = vector_db("faiss") 
             # faiss_vector_db.save_vector_db(store_name, chunks)     
-               
+     
+    # function to generate store name based on given html url              
     def get_store_name(self, input_url):                        
         # length of the input string
         len_url = len(input_url)
@@ -41,7 +43,8 @@ class html_embeddings:
             len_url = len(input_url)            
                 
         return f"{input_url[-(len_url-(pos_char + 1)):]}.faiss"  
-        
+    
+    # function to read and textify html    
     def read_and_textify_html(self, input_url):        
         # load URL
         loader = UnstructuredURLLoader(urls = [input_url])
@@ -71,8 +74,8 @@ class html_embeddings:
         #     print("Request was successful")
         # solution 2
         try:
-            # headers = {'User-Agent': 'Mozilla/5.0'}
-            resp = urllib3.request("GET", input_url)
+            headers = {'User-Agent': 'Mozilla/5.0'}
+            resp = urllib3.request("GET", input_url, headers = headers)
             print(resp.data)
         except Exception as e:
             # Handle other exceptions
