@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+from dotenv import dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PDFMinerLoader
 from langchain_community.vectorstores import FAISS

@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PDFMinerLoader
 from langchain_community.vectorstores import FAISS
@@ -15,8 +14,6 @@ class pdf_embeddings:
     # Instance attribute 
     def __init__(self, name): 
         self.name = name        
-        # read local .env file
-        load_dotenv() 
         # set upload directory path
         self.__directory = os.environ["upload_file_directory"]
       

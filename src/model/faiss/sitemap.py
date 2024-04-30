@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from langchain_community.document_loaders.sitemap import SitemapLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from bs4 import BeautifulSoup
@@ -13,8 +12,7 @@ class sitemap_embeddings:
     # Instance attribute 
     def __init__(self, name): 
         self.name = name 
-        load_dotenv() # read local .env file
-        
+                
     # function to generate sitemap embeddings
     def generate_sitemap_embeddings(self, input_sitemap):
         if input_sitemap !=  "":

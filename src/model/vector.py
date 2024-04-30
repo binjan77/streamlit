@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -8,10 +7,11 @@ class vector_db:
     # Instance attribute 
     def __init__(self, name): 
         self.name = name 
+        self.faiss_vector_store_directory = os.environ['faiss_vector_store_directory']
         
     # check if FAISS index / database exists
     def store_exists(self, store_name):
-        if os.path.exists(os.path.join(os.environ['vector_store_directory'], store_name)):
+        if os.path.exists(os.path.join(self.faiss_vector_store_directory, store_name)):
             return True
         else:
             return False
@@ -21,7 +21,7 @@ class vector_db:
         try:
             if (chunks):
                 # file __name__
-                store_path = os.path.join(os.environ['vector_store_directory'], store_name)
+                store_path = os.path.join(self.faiss_vector_store_directory, store_name)
                 # embeddings
                 if not os.path.exists(store_path):
                     embedding = OpenAIEmbeddings(model = os.environ['OPENAI_API_MODEL'])

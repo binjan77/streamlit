@@ -46,7 +46,7 @@
 #OPENAI_API_MODEL=text-embedding-3-large
 #chunk_size=2000
 #chunk_overlap=200
-#vector_store_directory=./vector_store/
+#faiss_vector_store_directory=./vector_store/faiss/
 #upload_file_directory=./data/
 
 # 6. run app

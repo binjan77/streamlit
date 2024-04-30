@@ -2,9 +2,9 @@ streamlit
 streamlit-extras
 python-dotenv
 pdfminer.six
-langchain==0.1.6
-langchain-community==0.0.19
-langchain-openai==0.0.6
+langchain==0.1.16
+langchain-community==0.0.34
+langchain-openai==0.1.4
 tiktoken==0.6.0
 openai
 swig

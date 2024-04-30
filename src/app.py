@@ -1,6 +1,11 @@
+from dotenv import load_dotenv
 import streamlit as st
       
 from widget.st_sidebar import sidebar
+
+###################################################################
+load_dotenv() # read local .env file
+###################################################################
 
 def main():
     sidebar()

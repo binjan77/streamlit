@@ -1,8 +1,8 @@
 import streamlit as st
 
-from model.embeddings.pdf import pdf_embeddings
-from model.embeddings.sitemap import sitemap_embeddings  
-from model.embeddings.html import html_embeddings       
+from model.faiss.pdf import pdf_embeddings
+from model.faiss.sitemap import sitemap_embeddings  
+from model.faiss.html import html_embeddings       
 
 from widget.st_sidebar import sidebar
    

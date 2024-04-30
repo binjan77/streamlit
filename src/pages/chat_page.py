@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from langchain_openai.llms import OpenAI
@@ -11,12 +10,8 @@ import json
 
 from widget.st_sidebar import sidebar
 
-###################################################################
-load_dotenv() # read local .env file
-###################################################################
-
 # variable for vector directory
-__vector_directory = os.environ['vector_store_directory']
+__faiss_vector_directory = os.environ['faiss_vector_store_directory']
 # OpenAI model
 __model = os.environ['OPENAI_API_MODEL']
 
@@ -27,9 +22,9 @@ if 'question_answer' not in st.session_state:
 def get_vector_database():    
     try:
         # check if vector directory is present 
-        if os.path.exists(__vector_directory):
+        if os.path.exists(__faiss_vector_directory):
             # get faiss files
-            dir_files = os.listdir(__vector_directory) 
+            dir_files = os.listdir(__faiss_vector_directory) 
             # faiss indexes are found 
             if len(dir_files) > 0:
                 # load vector database
@@ -50,7 +45,7 @@ def load_vector_database(dir_files):
     # loop through each file
     for dir_file in dir_files:
         # file_name
-        store_file_path = os.path.join(__vector_directory, dir_file)
+        store_file_path = os.path.join(__faiss_vector_directory, dir_file)
         # embeddings
         if os.path.exists(store_file_path):
             # first file
@@ -83,14 +78,18 @@ def search_similarities(search):
         query = json.dumps(search, separators = (',', ':'))        
         # st.write(query)        
         # run similarity search        
-        docs = __vector_db.similarity_search(query = query, k = 3)
+        docs = __vector_db.similarity_search(query=query, k=3)
         # create llm object
         llm = OpenAI(temperature = 0.2)
         # Q&A model
-        chain = load_qa_chain(llm = llm, chain_type = "stuff")
+        chain = load_qa_chain(
+            llm=llm, 
+            chain_type="stuff",
+            verbose=True
+        )
         # cost of the requests
         with get_openai_callback() as cb:
-            response = chain.run(input_documents = docs, question = search)
+            response=chain.run(input_documents = docs, question = search)
             print(cb)
             
         # Display user message in chat message container
