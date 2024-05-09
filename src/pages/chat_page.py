@@ -8,88 +8,38 @@ import streamlit as st
 import os as os
 import json 
 
-from widget.st_sidebar import sidebar
+from model.vector import get_vector_db
 
-# variable for vector directory
-__faiss_vector_directory = os.environ['faiss_vector_store_directory']
-# OpenAI model
-__model = os.environ['OPENAI_API_MODEL']
+from widget.st_sidebar import sidebar
+from enumerate.store_type import store_type
 
 if 'question_answer' not in st.session_state:
     st.session_state['question_answer'] = [ {"role": "system", "content": "You are a helpful assistant, please get me related information to the query I have posted."}]
-
-# load all vector database
-def get_vector_database():    
-    try:
-        # check if vector directory is present 
-        if os.path.exists(__faiss_vector_directory):
-            # get faiss files
-            dir_files = os.listdir(__faiss_vector_directory) 
-            # faiss indexes are found 
-            if len(dir_files) > 0:
-                # load vector database
-                vector_db = load_vector_database(dir_files)
-                return vector_db
-            else:
-                print("No files found.")
-        else:
-            st.write("Vector store path does not exists.")
-    except Exception as e:
-        # Handle other exceptions
-        print(f"An unexpected error occurred: {e}")
-        return False
-
-def load_vector_database(dir_files):
-    # counter to load first database index and later merge in database indexes
-    count = 0
-    # loop through each file
-    for dir_file in dir_files:
-        # file_name
-        store_file_path = os.path.join(__faiss_vector_directory, dir_file)
-        # embeddings
-        if os.path.exists(store_file_path):
-            # first file
-            if count ==  0:
-                vector_db = FAISS.load_local(store_file_path, OpenAIEmbeddings(model = __model))
-            # 2nd, 3rd, 4th, so on...
-            elif count > 0:
-                # load vector db
-                load_vector_db = FAISS.load_local(store_file_path, OpenAIEmbeddings(model = __model))
-                # merge 2 dbs
-                vector_db.merge_from(load_vector_db)
-            else:
-                print("failed to load FAISS database.")
-                
-            # increment counter
-            count +=  1
-        else:
-            print(f"Store '{store_file_path}' not found.")
-     
-    return vector_db
             
 ###################################################################
-__vector_db = get_vector_database()
-###################################################################
+__vector_db = get_vector_db(store_type.FAISS.value)
+ ##################################################################
    
 # search answer for the query 
-def search_similarities(search):
+def search_similarities():
+    search = st.session_state.question_answer
     # if query has value and 
     if search and __vector_db:
-        query = json.dumps(search, separators = (',', ':'))        
+        query = json.dumps(search, separators=(',', ':'))        
         # st.write(query)        
         # run similarity search        
         docs = __vector_db.similarity_search(query=query, k=3)
         # create llm object
-        llm = OpenAI(temperature = 0.2)
+        llm = OpenAI(temperature=0.2)
         # Q&A model
-        chain = load_qa_chain(
+        chain=load_qa_chain(
             llm=llm, 
             chain_type="stuff",
             verbose=True
         )
         # cost of the requests
         with get_openai_callback() as cb:
-            response=chain.run(input_documents = docs, question = search)
+            response=chain.run(input_documents=docs, question=search[:-1])
             print(cb)
             
         # Display user message in chat message container
@@ -117,7 +67,7 @@ def question_answer():
         # Add user message to chat history
         st.session_state.question_answer.append({"role": "user", "content": prompt})
         # search for similarities
-        search_similarities(st.session_state.question_answer)
+        search_similarities()
         
 def main():
     sidebar()

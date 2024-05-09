@@ -3,7 +3,8 @@
 /data
 /vector_store
 /sample_streamlit
+/src/enumerate/__pycache__
 /src/model/__pycache__
-/src/model/faiss/__pycache__
+/src/model/doc_type/__pycache__
 /src/widget/__pycache__
 .env

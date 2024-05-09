@@ -5,6 +5,7 @@ pdfminer.six
 langchain==0.1.16
 langchain-community==0.0.34
 langchain-openai==0.1.4
+langchain_chroma
 tiktoken==0.6.0
 openai
 swig

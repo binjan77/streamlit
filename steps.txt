@@ -35,6 +35,7 @@
 #pip install langchain==0.1.6
 #pip install langchain-community==0.0.19
 #pip install langchain-openai==0.0.6
+#pip install langchain_chroma
 #pip install tiktoken==0.6.0
 #pip install openai
 #pip install swig

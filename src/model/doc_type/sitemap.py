@@ -6,40 +6,39 @@ import streamlit as st
 import os as os
 
 # import local class file
-from model.vector import vector_db
+from model.vector import save_vector_db, store_exists
+from enumerate.store_type import store_type
 
-class sitemap_embeddings:    
+class sitemap_doc:    
     # Instance attribute 
     def __init__(self, name): 
         self.name = name 
-                
+                                
     # function to generate sitemap embeddings
-    def generate_sitemap_embeddings(self, input_sitemap):
+    def generate_store_from_sitemap(self, selected_store_type: int, input_sitemap: str):    
         if input_sitemap !=  "":
             # vector store name       
-            store_name = self.get_store_name(input_sitemap)     
-            # generate embeddings
-            obj_faiss_vector_db = vector_db("faiss") 
+            store_name = self.get_store_name(input_sitemap, selected_store_type)  
             # check vector store exits
-            if not obj_faiss_vector_db.store_exists(store_name):              
-                sitemap_loader = SitemapLoader(web_path = input_sitemap)
+            if not store_exists(store_name, selected_store_type):              
+                sitemap_loader = SitemapLoader(web_path=input_sitemap)
                 sitemap_loader.requests_per_second = 50
                 
                 docs = sitemap_loader.load()      
                 # get chunks from sitemap url
                 chunks = self.read_and_textify_docs(docs)
-                obj_faiss_vector_db.save_vector_db(store_name, chunks)
+                save_vector_db(store_name, selected_store_type, chunks)
                 # return true as all the process is completed successfully
                 return True
             else:
-                st.write(f"Sitemap: {input_sitemap}, FAISS index is exists.")  
+                st.write(f"Sitemap: {input_sitemap}, FAISS Index OR Chroma database is exists.")  
                 # return true as all the process is completed successfully
                 return False      
         else:    
             return False
     
     # function to generate store name based on given sitemap url         
-    def get_store_name(self, input_sitemap):                        
+    def get_store_name(self, input_sitemap: str, selected_store_type: int):                        
         # length of the input string
         len_url = len(input_sitemap)
         # find last position of character "//"
@@ -52,22 +51,26 @@ class sitemap_embeddings:
             # recalculate length of the string
             len_url = len(input_sitemap)       
             
-        return  f"{input_sitemap[-(len_url-(double_forward_slash_pos_char + 2)):].replace("/", ".")}.faiss"              
-            
+        match selected_store_type:
+            case store_type.FAISS.value:
+                return  f"{input_sitemap[-(len_url-(double_forward_slash_pos_char + 2)):].replace("/", ".")}"              
+            case store_type.CHROMA.value:
+                return f"{input_sitemap[-(len_url-(double_forward_slash_pos_char + 2)):].replace("/", ".")[:63]}"
+    
     # function to read and textify sitemap docs
     def read_and_textify_docs(self, docs):
         chunks = []
         # define text splitter
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size = int(os.environ['chunk_size']),
-            chunk_overlap = int(os.environ['chunk_overlap']),
-            length_function = len
+            chunk_size=int(os.environ['chunk_size']),
+            chunk_overlap=int(os.environ['chunk_overlap']),
+            length_function=len
         )
                 
         # loop each document
         for doc in docs:           
             #st.write(doc.page_content) 
-            chunks += text_splitter.split_text(text = self.remove_html_tags(doc.page_content))
+            chunks += text_splitter.split_text(text=self.remove_html_tags(doc.page_content))
             
         return chunks
 
