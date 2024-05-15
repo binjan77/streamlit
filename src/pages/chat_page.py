@@ -14,10 +14,10 @@ from widget.st_sidebar import sidebar
 from enumerate.store_type import store_type
 
 if 'question_answer' not in st.session_state:
-    st.session_state['question_answer'] = [ {"role": "system", "content": "You are a helpful assistant, please get me related information to the query I have posted."}]
+    st.session_state['question_answer'] = [{"role": "system", "content": "You are a helpful assistant, please get me related information to the query I have posted."}]
             
 ###################################################################
-__vector_db = get_vector_db(store_type.FAISS.value)
+__vector_db = get_vector_db()
  ##################################################################
    
 # search answer for the query 

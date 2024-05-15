@@ -8,7 +8,7 @@ import os as os
 import urllib3
 
 # import local class file
-from model.vector import save_vector_db
+from model.vector import save_faiss_vector_db
 
 class html_doc:    
     # Instance attribute 
@@ -24,7 +24,7 @@ class html_doc:
             chunks = self.read_and_textify_html_urllib3(input_url)
             st.write(chunks)
             # # generate embeddings
-            # save_vector_db(store_name, chunks)     
+            # save_faiss_vector_db(store_name, chunks)     
      
     # function to generate store name based on given html url              
     def get_store_name(self, input_url: str):                        
@@ -69,8 +69,8 @@ class html_doc:
         #         method="GET",
         #         url=input_url,
         #         headers=headers)
-        #     print(f">>> An unexpected error occurred: {resp.data}")
-        #     print(">>> Request was successful")
+        #     print(f">>> html.py > An unexpected error occurred: {resp.data}")
+        #     print(">>> html.py > Request was successful")
         # solution 2
         try:
             headers = {'User-Agent': 'Mozilla/5.0'}
@@ -81,4 +81,4 @@ class html_doc:
             print(f">>> read_and_textify_html_urllib3: An unexpected error occurred: {e}")
         # except HTTPSConnectionPool as e:
         #     # Handle HTTPConnectionPool exceptions
-        #     print(f">>> An HTTPConnectionPool exception occurred: {e}")
+        #     print(f">>> html.py > An HTTPConnectionPool exception occurred: {e}")

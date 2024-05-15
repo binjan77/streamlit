@@ -6,7 +6,7 @@ import streamlit as st
 import os as os
 
 # import local class file
-from model.vector import save_vector_db, store_exists
+from model.vector import save_faiss_vector_db, save_chroma_vector_db, store_exists
 from enumerate.store_type import store_type
 
 class sitemap_doc:    
@@ -15,7 +15,10 @@ class sitemap_doc:
         self.name = name 
                                 
     # function to generate sitemap embeddings
-    def generate_store_from_sitemap(self, selected_store_type: int, input_sitemap: str):    
+    def generate_store_from_sitemap(self, input_sitemap: str):            
+        # store selection 
+        selected_store_type = int(os.environ["vector_store"])
+        
         if input_sitemap !=  "":
             # vector store name       
             store_name = self.get_store_name(input_sitemap, selected_store_type)  
@@ -23,11 +26,17 @@ class sitemap_doc:
             if not store_exists(store_name, selected_store_type):              
                 sitemap_loader = SitemapLoader(web_path=input_sitemap)
                 sitemap_loader.requests_per_second = 50
+                # load sitemap
+                docs = sitemap_loader.load() 
                 
-                docs = sitemap_loader.load()      
-                # get chunks from sitemap url
-                chunks = self.read_and_textify_docs(docs)
-                save_vector_db(store_name, selected_store_type, chunks)
+                match selected_store_type:
+                    case store_type.FAISS.value:     
+                        # get chunks from sitemap url
+                        chunks = self.read_and_textify_docs(docs)
+                        save_faiss_vector_db(store_name, chunks)
+                    case store_type.CHROMA.value:                     
+                        save_chroma_vector_db(store_name, docs)
+                        
                 # return true as all the process is completed successfully
                 return True
             else:
@@ -59,20 +68,24 @@ class sitemap_doc:
     
     # function to read and textify sitemap docs
     def read_and_textify_docs(self, docs):
-        chunks = []
-        # define text splitter
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=int(os.environ['chunk_size']),
-            chunk_overlap=int(os.environ['chunk_overlap']),
-            length_function=len
-        )
+        try:
+            chunks = []
+            # define text splitter
+            text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+                chunk_size=int(os.environ['chunk_size']),
+                chunk_overlap=int(os.environ['chunk_overlap'])
+            )
+                    
+            # loop each document
+            for doc in docs:           
+                #st.write(doc.page_content) 
+                chunks += text_splitter.split_text(text=self.remove_html_tags(doc.page_content))
                 
-        # loop each document
-        for doc in docs:           
-            #st.write(doc.page_content) 
-            chunks += text_splitter.split_text(text=self.remove_html_tags(doc.page_content))
-            
-        return chunks
+            return chunks
+        except Exception as e:
+            # Handle other exceptions
+            print(f">>> sitemap.py > read_and_textify_docs: An unexpected error occurred: {e}")
+            return False
 
     # function to remove all html tags
     def remove_html_tags(self, text):

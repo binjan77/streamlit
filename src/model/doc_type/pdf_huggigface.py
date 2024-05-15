@@ -8,7 +8,7 @@ import streamlit as st
 import os as os
 
 # import local class file
-from model.vector import save_vector_db
+from model.vector import save_faiss_vector_db
 from model.upload_file import upload_file
 
 class pdf_huggigface_doc:   
@@ -20,7 +20,7 @@ class pdf_huggigface_doc:
         self.name = name 
     
     # function to generate pdf embeddings using hugging face        
-    def generate_pdf_huggingface(self,selected_store_type: int, pdfs):
+    def generate_pdf_huggingface(self, pdfs):         
         # if file is selected
         if pdfs is not None:
             # loop all PDF files
@@ -32,7 +32,7 @@ class pdf_huggigface_doc:
                     # get chunks from uploaded file
                     chunks = self.read_and_textify_pdf(pdf)
                     # save chunks
-                    save_vector_db(store_name, selected_store_type, chunks) 
+                    save_faiss_vector_db(store_name, chunks) 
 
     # function to read and textify pdf   
     def read_and_textify_pdf(self, pdf):

@@ -16,6 +16,6 @@ def upload_file(path: str, file):
             return False
     except Exception as e:
         # Handle other exceptions
-        print(f">>> upload_file: An unexpected error occurred: {e}")
+        print(f">>> upload_file.py > upload_file: An unexpected error occurred: {e}")
         return False
         
