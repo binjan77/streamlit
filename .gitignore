@@ -1,10 +1,6 @@
 # ignore file and folder list
 /.venv
 /data
-/vector_store
-/sample_streamlit
-/src/enumerate/__pycache__
-/src/model/__pycache__
-/src/model/doc_type/__pycache__
-/src/widget/__pycache__
+/vector_db
+**/__pycache__
 .env

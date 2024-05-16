@@ -4,80 +4,79 @@ from langchain_openai.llms import OpenAI
 from langchain.chains.question_answering import load_qa_chain
 from langchain_community.callbacks import get_openai_callback
 
-import streamlit as st
-import os as os
-import json 
-
-from model.vector import get_vector_db
+from biz.vector_store_util.util import get_vector_db
+from biz.util.store_type import store_type  # Import store type enumeration for storing embeddings
 
 from widget.st_sidebar import sidebar
-from enumerate.store_type import store_type
 
+import streamlit as st
+import os
+import json 
+
+# Initialize the chat history if it doesn't exist
 if 'question_answer' not in st.session_state:
     st.session_state['question_answer'] = [{"role": "system", "content": "You are a helpful assistant, please get me related information to the query I have posted."}]
-            
-###################################################################
+
+# Fetch the vector database
 __vector_db = get_vector_db()
- ##################################################################
-   
-# search answer for the query 
+
+# Search for similarities based on the user's query
 def search_similarities():
+    """
+    Search for similarities based on the user's query and generate a response.
+    """
     search = st.session_state.question_answer
-    # if query has value and 
     if search and __vector_db:
         query = json.dumps(search, separators=(',', ':'))        
-        # st.write(query)        
-        # run similarity search        
         docs = __vector_db.similarity_search(query=query, k=3)
-        # create llm object
-        llm = OpenAI(temperature=0.2)
-        # Q&A model
+        llm = OpenAI(
+            temperature=0.2, 
+            model=os.environ["OPENAI_API_MODEL"]
+        )
         chain=load_qa_chain(
             llm=llm, 
             chain_type="stuff",
             verbose=True
         )
-        # cost of the requests
         with get_openai_callback() as cb:
             response=chain.run(input_documents=docs, question=search[:-1])
             print(cb)
-            
-        # Display user message in chat message container
         st.chat_message("assistant").markdown(response)
-        # Add assistant response to chat history
         st.session_state.question_answer.append({"role": "assistant", "content": response})
-   
-# function to display question answer from session state
+
+# Display the chat history
 def display_qna():    
-    # Display chat messages from history on app rerun
+    """
+    Display the chat history.
+    """ 
     for qna in st.session_state.question_answer:
         if (qna["role"] == "user" or qna["role"] == "assistant"):
             with st.chat_message(qna["role"]):
                 st.markdown(qna["content"])
-   
-# function to display input field for ask question
+
+# Allow users to input questions and get answers
 def question_answer():    
-    # display qna
+    """
+    Allow users to input questions and get answers.
+    """
     display_qna()
     
-    # React to user input
     if prompt :=  st.chat_input("Enter text here"):
-        # Display user message in chat message container
         st.chat_message("user").markdown(prompt)
-        # Add user message to chat history
         st.session_state.question_answer.append({"role": "user", "content": prompt})
-        # search for similarities
         search_similarities()
-        
+
 def main():
+    """
+    Main function to setup UI and start the chatbot application.
+    """
     sidebar()
     
     if __vector_db:
         st.markdown("**Welcome to our internal chatbot app, tailored for Software AG employees! Find answers to your questions here.**")
-        # show UI for ask questions
         question_answer()
     else:
         st.write("No vector store found.")   
-        
+
 if __name__ ==  '__main__':
     main()

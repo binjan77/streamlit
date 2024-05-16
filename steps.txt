@@ -47,8 +47,8 @@
 # OPENAI_API_MODEL=GPT-4o
 # chunk_size=2000
 # chunk_overlap=200
-# faiss_vector_store_directory=./vector_store/faiss/
-# chroma_vector_store_directory=./vector_store/chroma/
+# faiss_vector_store_directory=./vector_db/faiss/
+# chroma_vector_store_directory=./vector_db/chroma/
 # upload_file_directory=./data/
 # tracing logs to OpenAI
 # LANGCHAIN_TRACING_V2=true
