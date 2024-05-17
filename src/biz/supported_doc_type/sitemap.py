@@ -6,11 +6,11 @@ from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
 # Import local class file
 from biz.vector_store_util.faiss import save_faiss_vector_db  # Import function to save embeddings to FAISS vector database
 from biz.vector_store_util.chroma import save_chroma_vector_db  # Import function to save embeddings to Chroma vector database
-from biz.vector_store_util.util import store_exists  # Import function to check if store exists
+from biz.vector_store_util.util import vector_store_exists  # Import function to check if store exists
 from biz.util.store_type import store_type  # Import store type enumeration for storing embeddings
 
 import streamlit as st  # Import Streamlit for creating interactive web apps
-import os as os  # Import os module for file and directory operations
+import os  # Import os module for file and directory operations
 
 class sitemap_doc:    
     # Instance attribute 
@@ -18,17 +18,22 @@ class sitemap_doc:
         self.name = name  # Initialize sitemap document name 
                                 
     # function to generate sitemap embeddings
-    def generate_store_from_sitemap(self, input_sitemap: str):            
+    def generate_store_from_sitemap(self, input_sitemap: str) -> bool:
+        result = False         
         # store selection 
-        selected_store_type = int(os.environ.get("vector_store", 0))  # Retrieve selected store type from environment variables
+        selected_store_type = int(os.environ.get("vector_store", -1))  # Retrieve selected store type from environment variables
+        print(f'>>> Store type:{selected_store_type}')
         
         if input_sitemap != "":
             # vector store name       
             store_name = self.get_store_name(input_sitemap, selected_store_type)  # Generate vector store name
             
             try:
-                if not store_exists(store_name, selected_store_type):  # Check if store already exists              
-                    sitemap_loader = SitemapLoader(web_path=input_sitemap)  # Create sitemap loader object
+                if not vector_store_exists(store_name, selected_store_type):  # Check if store already exists              
+                    sitemap_loader = SitemapLoader(
+                            web_path=input_sitemap,
+                            parsing_function=self.remove_nav_and_header_elements
+                        )  # Create sitemap loader object
                     sitemap_loader.requests_per_second = 50  # Set requests per second
                     
                     # Load documents from sitemap
@@ -36,28 +41,28 @@ class sitemap_doc:
                     
                     # Perform actions based on selected store type
                     match selected_store_type:
-                        case store_type.FAISS.value:     
+                        case store_type.FAISS.value:   
+                            print('>>> FAISS.')  
                             # Get text chunks from sitemap url
                             chunks = self.read_and_textify_docs(docs)  # Extract text chunks from documents
-                            save_faiss_vector_db(store_name, chunks)  # Save embeddings to FAISS vector database
-                        case store_type.CHROMA.value:                     
-                            save_chroma_vector_db(store_name, docs)  # Save embeddings to Chroma vector database
-
-                    # Inform if store already exists
-                    st.write(f"Sitemap: {input_sitemap}, FAISS Index OR Chroma database already exists.")  
-                    return False
+                            result = save_faiss_vector_db(store_name, chunks)  # Save embeddings to FAISS vector database
+                        case store_type.CHROMA.value:                               
+                            print('>>> CHROMA.')                       
+                            result = save_chroma_vector_db(store_name, docs)  # Save embeddings to Chroma vector database
                 else:
                     # Return False if store already exists
                     st.write(f"Sitemap: {input_sitemap}, FAISS Index OR Chroma database already exists.")  
-                    return False
+                    result = False
             except Exception as e:
                 # Handle exception if sitemap loading fails
                 st.write(f"Error occurred while processing sitemap: {str(e)}")
-                return False      
+                result = False      
         else:    
             # Return False if no sitemap provided
             st.write("No sitemap provided.")
-            return False
+            result = False
+            
+        return result
     
     # function to generate store name based on given sitemap url         
     def get_store_name(self, input_sitemap: str, selected_store_type: int):                        
@@ -93,11 +98,13 @@ class sitemap_doc:
             text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
                 chunk_size=int(os.environ.get('chunk_size', 1000)),  # Get chunk size from environment variables
                 chunk_overlap=int(os.environ.get('chunk_overlap', 100))  # Get chunk overlap from environment variables
-            )
-                    
+            )           
+                        
             # Loop through each document
             for doc in docs:           
-                chunks += text_splitter.split_text(text=self.remove_html_tags(doc.page_content))  # Split text into chunks and add to list
+                content = text_splitter.split_text(text=self.remove_html_tags(doc.page_content))  # Split text into chunks and add to list
+                # print(f'content: {content}')
+                chunks += content
                 
             return chunks  # Return text chunks
         except Exception as e:
@@ -123,11 +130,12 @@ class sitemap_doc:
             # Find all 'nav' and 'header' elements in the BeautifulSoup object
             nav_elements = content.find_all("nav")
             header_elements = content.find_all("header")
-
+            button_elements = content.find_all("button")
+            
             # Remove each 'nav' and 'header' element from the BeautifulSoup object
-            for element in nav_elements + header_elements:
+            for element in nav_elements + header_elements + button_elements:
                 element.decompose()
-
+                
             return str(content.get_text())  # Return cleaned text
         except Exception as e:
             # Handle exception if removal of navigation and header elements fails

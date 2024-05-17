@@ -1,48 +1,17 @@
-from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings
-from langchain_openai.llms import OpenAI
-from langchain.chains.question_answering import load_qa_chain
-from langchain_community.callbacks import get_openai_callback
-
-from biz.vector_store_util.util import get_vector_db
-from biz.util.store_type import store_type  # Import store type enumeration for storing embeddings
+from biz.chain.qa_chain import search_similarities as qa_search_similarities 
+from biz.chain.create_retrieval_chain import search_similarities as create_retrieval_chain_search_similarities
+from biz.util.chain_type import chain_type  # Import store type enumeration for storing embeddings
+from biz.vector_store_util.util import vector_store_dir_exists
 
 from widget.st_sidebar import sidebar
 
 import streamlit as st
 import os
-import json 
 
 # Initialize the chat history if it doesn't exist
 if 'question_answer' not in st.session_state:
     st.session_state['question_answer'] = [{"role": "system", "content": "You are a helpful assistant, please get me related information to the query I have posted."}]
 
-# Fetch the vector database
-__vector_db = get_vector_db()
-
-# Search for similarities based on the user's query
-def search_similarities():
-    """
-    Search for similarities based on the user's query and generate a response.
-    """
-    search = st.session_state.question_answer
-    if search and __vector_db:
-        query = json.dumps(search, separators=(',', ':'))        
-        docs = __vector_db.similarity_search(query=query, k=3)
-        llm = OpenAI(
-            temperature=0.2, 
-            model=os.environ["OPENAI_API_MODEL"]
-        )
-        chain=load_qa_chain(
-            llm=llm, 
-            chain_type="stuff",
-            verbose=True
-        )
-        with get_openai_callback() as cb:
-            response=chain.run(input_documents=docs, question=search[:-1])
-            print(cb)
-        st.chat_message("assistant").markdown(response)
-        st.session_state.question_answer.append({"role": "assistant", "content": response})
 
 # Display the chat history
 def display_qna():    
@@ -62,17 +31,37 @@ def question_answer():
     display_qna()
     
     if prompt :=  st.chat_input("Enter text here"):
-        st.chat_message("user").markdown(prompt)
-        st.session_state.question_answer.append({"role": "user", "content": prompt})
-        search_similarities()
-
+        try:
+            st.chat_message("user").markdown(prompt)
+            st.session_state.question_answer.append({"role": "user", "content": prompt})
+            # Get chain name from enviroment
+            selected_chain = int(os.environ["chain_type"]) 
+            if (selected_chain == chain_type.qa_chain.value):
+                print('>>> QA chain.')
+                # find similarities (qa_chain)
+                response = qa_search_similarities(prompt)
+                st.chat_message("assistant").markdown(response)
+                st.session_state.question_answer.append({"role": "assistant", "content": response})
+            elif (selected_chain == chain_type.create_retrieval_chain.value):
+                print('>>> create_retrieval_chain.')
+                # find similarities (conversational retrieval chain)
+                response = create_retrieval_chain_search_similarities(prompt)
+                st.chat_message("assistant").markdown(response)
+                st.session_state.question_answer.append({"role": "assistant", "content": response})
+            else:
+                st.write(">>> No Chain type is found in environment.")
+        except Exception as e:
+            # Handle exception if sitemap loading fails
+            st.write(f"Error occurred while question prompt: {str(e)}")
+            return False  
+        
 def main():
     """
     Main function to setup UI and start the chatbot application.
     """
     sidebar()
     
-    if __vector_db:
+    if vector_store_dir_exists():
         st.markdown("**Welcome to our internal chatbot app, tailored for Software AG employees! Find answers to your questions here.**")
         question_answer()
     else:

@@ -1,5 +1,5 @@
 import streamlit as st  # Import Streamlit for creating interactive web apps
-import os as os  # Import os module for file and directory operations
+import os  # Import os module for file and directory operations
 
 def upload_file(path: str, file):  
     """

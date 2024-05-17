@@ -43,14 +43,30 @@
 
 # 5. create .env file on root 
 # add following keys with value
+# # OpenAI API settings
 # OPENAI_API_KEY=
-# OPENAI_API_MODEL=GPT-4o
+# OPENAI_API_EMBEGGING_MODEL=text-embedding-3-large
+# OPENAI_API_GPT_MODEL=GPT-4o
+
+# # Chunk settings
 # chunk_size=2000
 # chunk_overlap=200
-# faiss_vector_store_directory=./vector_db/faiss/
-# chroma_vector_store_directory=./vector_db/chroma/
-# upload_file_directory=./data/
-# tracing logs to OpenAI
+
+# # related document from vector db
+# related_doc_count=3
+
+# # Vector store directories
+# faiss_vector_store_directory='./vector_db/faiss/'
+# chroma_vector_store_directory='./vector_db/chroma/'
+# upload_file_directory='./data/'
+
+# # Vector store type (0 for FAISS, 1 for Chroma)
+# vector_store=1
+
+# # Chain type (0 for qa_chain, 1 for conversational_retrieval_chain)
+# chain_type=1
+
+# # LangSmith tracing settings
 # LANGCHAIN_TRACING_V2=true
 # LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
 # LANGCHAIN_API_KEY=

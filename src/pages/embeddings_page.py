@@ -5,7 +5,7 @@ from biz.util.store_type import store_type  # Import store type enumeration for 
 from widget.st_sidebar import sidebar
 
 import streamlit as st
-import os as os
+import os
 
 def generate_store():        
     """

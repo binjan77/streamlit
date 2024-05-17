@@ -1,17 +1,15 @@
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 
-# Import local class file
-from biz.vector_store_util.util import store_exists  # Check if a store exists at the specified path
-from biz.util.store_type import store_type # Enumeration checking for different types of vector stores
-
 import os  # For interacting with the file system
 import streamlit as st  # For displaying messages in Streamlit
+import chromadb
 
 # Directory for storing Chroma vector data
 __chroma_vector_store_directory = os.environ.get('chroma_vector_store_directory')
+__embedding_model = os.environ["OPENAI_API_EMBEGGING_MODEL"]
 
-def save_chroma_vector_db(store_name: str, docs):
+def save_chroma_vector_db(store_name: str, docs) -> bool:
     """
     Save documents into a Chroma vector database.
 
@@ -22,15 +20,16 @@ def save_chroma_vector_db(store_name: str, docs):
     Returns:
     - None
     """
+    result = False
     try:
         if docs:
             # Construct the path for storing the vector database
             store_path = os.path.join(__chroma_vector_store_directory, store_name)
             
             # Check if the vector store already exists
-            if not store_exists(store_path, store_type.CHROMA.value):
+            if not os.path.exists(store_path):
                 # Initialize OpenAIEmbeddings
-                embeddings = OpenAIEmbeddings()
+                embeddings = OpenAIEmbeddings(model=__embedding_model)
                 
                 # Store documents into the Chroma vector database
                 Chroma.from_documents(
@@ -39,12 +38,16 @@ def save_chroma_vector_db(store_name: str, docs):
                     collection_name=store_name,
                     persist_directory=store_path
                 )
+                
+                result = True
     except FileNotFoundError:
         # Handle the case where the directory doesn't exist
         print(f">>> vector.py > save_chroma_vector_db: Directory '{__chroma_vector_store_directory}' not found.")
     except Exception as e:
         # Handle other unexpected exceptions
         print(f">>> vector.py > save_chroma_vector_db: An unexpected error occurred: {e}")
+        
+    return result 
 
 def get_chroma_vector_db():
     """
@@ -61,7 +64,7 @@ def get_chroma_vector_db():
             
             if dir_files:
                 # Load the Chroma vector database
-                vector_db = load_chroma_database_as_vector_database(dir_files)
+                vector_db = load_chroma_database(dir_files)
                 return vector_db
             else:
                 print(">>> No files found.")
@@ -75,7 +78,7 @@ def get_chroma_vector_db():
         print(f">>> vector.py > get_chroma_vector_db: An unexpected error occurred: {e}")
         return False
 
-def load_chroma_database_as_vector_database(dir_files):
+def load_chroma_database(dir_files):
     """
     Load Chroma vector database from files.
 
@@ -89,31 +92,21 @@ def load_chroma_database_as_vector_database(dir_files):
         # Initialize an empty vector database
         vector_db = None
         
-        # Loop through each file in the directory
-        for dir_file in dir_files:
-            # Check if the file is a Chroma vector database
-            if store_exists(dir_file, store_type.CHROMA.value):
-                # Construct the full path to the file
-                store_file_path = os.path.join(__chroma_vector_store_directory, dir_file)
-                
-                # Load the vector database
-                if vector_db is None:
-                    vector_db = Chroma.from_documents(
-                        store_file_path, 
-                        OpenAIEmbeddings()
-                    )
-                else:
-                    # Merge the current vector database with the loaded one
-                    loaded_vector_db = Chroma.from_documents(
-                        store_file_path, 
-                        OpenAIEmbeddings()
-                    )
-                    vector_db.merge_from(loaded_vector_db)
-            else:
-                print(f">>> Store '{os.path.join(__chroma_vector_store_directory, dir_file)}' not found.")
-        
+        # instantiate embedding object
+        openai_embeddings = OpenAIEmbeddings(model=__embedding_model)
+        client_settings = chromadb.config.Settings(
+            is_persistent=True,
+            persist_directory=__chroma_vector_store_directory,
+            anonymized_telemetry=False
+        )
+        vector_db = Chroma(
+            collection_name="project_store_all",
+            persist_directory=__chroma_vector_store_directory,
+            client_settings=client_settings,
+            embedding_function=openai_embeddings
+        )
         return vector_db
     except Exception as e:
         # Handle unexpected exceptions
-        print(f">>> vector.py > load_chroma_database_as_vector_database: An unexpected error occurred: {e}")
+        print(f">>> vector.py > load_chroma_database_as_faiss_index: An unexpected error occurred: {e}")
         return None

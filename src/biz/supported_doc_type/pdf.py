@@ -5,12 +5,12 @@ from langchain_community.document_loaders import PDFMinerLoader  # Import PDF lo
 # Import local class file
 from biz.vector_store_util.faiss import save_faiss_vector_db  # Import function to save embeddings to FAISS vector database
 from biz.vector_store_util.chroma import save_chroma_vector_db  # Import function to save embeddings to Chroma vector database
-from biz.vector_store_util.util import store_exists  # Import function to check whether the vector store exists
+from biz.vector_store_util.util import vector_store_exists  # Import function to check whether the vector store exists
 from biz.util.upload_file import upload_file  # Import function to upload files
 from biz.util.store_type import store_type  # Import store type enumeration for storing embeddings
 
 import streamlit as st  # Import Streamlit for creating interactive web apps
-import os as os  # Import os module for file and directory operations
+import os  # Import os module for file and directory operations
 
 # Define a class for handling PDF documents
 class pdf_doc:
@@ -37,7 +37,7 @@ class pdf_doc:
                 store_name = self.get_store_name(pdf.name, selected_store_type)
                 
                 # Check if the store already exists
-                if not store_exists(store_name, selected_store_type):
+                if not vector_store_exists(store_name, selected_store_type):
                     # Upload the PDF file to the specified directory
                     if upload_file(self.__directory, pdf):
                         # Generate text from the uploaded PDF file
