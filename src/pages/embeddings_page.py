@@ -1,6 +1,5 @@
 from biz.supported_doc_type.pdf import pdf_doc
 from biz.supported_doc_type.sitemap import sitemap_doc
-from biz.util.store_type import store_type  # Import store type enumeration for storing embeddings
 
 from widget.st_sidebar import sidebar
 
@@ -44,7 +43,7 @@ def main():
         # Upload a PDF file
         st.file_uploader("Upload your PDF", type='pdf', key='file_upload_widget', accept_multiple_files=True)
         # Enter a sitemap URL
-        st.text_input("Enter Sitemap Url", key='sitemap_widget')
+        st.text_input("Enter Sitemap Url", key='sitemap_widget', value="https://cumulocity.com/docs/sitemap.xml")
         # Submit button to generate embeddings
         st.form_submit_button("Generate Embeddings", on_click=generate_store)
        

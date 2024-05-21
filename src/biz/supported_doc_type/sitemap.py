@@ -4,10 +4,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter  # Import tex
 from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
 
 # Import local class file
-from biz.vector_store_util.faiss import save_faiss_vector_db  # Import function to save embeddings to FAISS vector database
 from biz.vector_store_util.chroma import save_chroma_vector_db  # Import function to save embeddings to Chroma vector database
 from biz.vector_store_util.util import vector_store_exists  # Import function to check if store exists
-from biz.util.store_type import store_type  # Import store type enumeration for storing embeddings
 
 import streamlit as st  # Import Streamlit for creating interactive web apps
 import os  # Import os module for file and directory operations
@@ -20,16 +18,12 @@ class sitemap_doc:
     # function to generate sitemap embeddings
     def generate_store_from_sitemap(self, input_sitemap: str) -> bool:
         result = False         
-        # store selection 
-        selected_store_type = int(os.environ.get("vector_store", -1))  # Retrieve selected store type from environment variables
-        print(f'>>> Store type:{selected_store_type}')
-        
         if input_sitemap != "":
             # vector store name       
-            store_name = self.get_store_name(input_sitemap, selected_store_type)  # Generate vector store name
+            store_name = self.get_store_name(input_sitemap)  # Generate vector store name
             
             try:
-                if not vector_store_exists(store_name, selected_store_type):  # Check if store already exists              
+                if not vector_store_exists(store_name):  # Check if store already exists              
                     sitemap_loader = SitemapLoader(
                             web_path=input_sitemap,
                             parsing_function=self.remove_nav_and_header_elements
@@ -38,20 +32,13 @@ class sitemap_doc:
                     
                     # Load documents from sitemap
                     docs = sitemap_loader.load()  
-                    
-                    # Perform actions based on selected store type
-                    match selected_store_type:
-                        case store_type.FAISS.value:   
-                            print('>>> FAISS.')  
-                            # Get text chunks from sitemap url
-                            chunks = self.read_and_textify_docs(docs)  # Extract text chunks from documents
-                            result = save_faiss_vector_db(store_name, chunks)  # Save embeddings to FAISS vector database
-                        case store_type.CHROMA.value:                               
-                            print('>>> CHROMA.')                       
-                            result = save_chroma_vector_db(store_name, docs)  # Save embeddings to Chroma vector database
+                    # split docs
+                    split_docs = self.read_and_textify_docs(docs)
+                    # Save docs to Chroma vector database
+                    result = save_chroma_vector_db(store_name, split_docs)  
                 else:
                     # Return False if store already exists
-                    st.write(f"Sitemap: {input_sitemap}, FAISS Index OR Chroma database already exists.")  
+                    st.write(f"Sitemap: {input_sitemap}, CHROMA DB already exists.")  
                     result = False
             except Exception as e:
                 # Handle exception if sitemap loading fails
@@ -65,7 +52,7 @@ class sitemap_doc:
         return result
     
     # function to generate store name based on given sitemap url         
-    def get_store_name(self, input_sitemap: str, selected_store_type: int):                        
+    def get_store_name(self, input_sitemap: str):                        
         try:
             # Length of the input string
             len_url = len(input_sitemap)
@@ -80,11 +67,7 @@ class sitemap_doc:
                 len_url = len(input_sitemap)       
                 
             # Generate store name based on the selected store type
-            match selected_store_type:
-                case store_type.FAISS.value:
-                    return  f"{input_sitemap[-(len_url-(double_forward_slash_pos_char + 2)):].replace('/', '.')}"              
-                case store_type.CHROMA.value:
-                    return f"{input_sitemap[-(len_url-(double_forward_slash_pos_char + 2)):].replace('/', '.')[:63]}"
+            return f"{input_sitemap[-(len_url-(double_forward_slash_pos_char + 2)):].replace('/', '.')[:63]}"
         except Exception as e:
             # Handle exception if generating store name fails
             st.write(f"Error occurred while generating store name: {str(e)}")
@@ -93,20 +76,18 @@ class sitemap_doc:
     # function to read and textify sitemap docs
     def read_and_textify_docs(self, docs):
         try:
-            chunks = []  # Initialize list to store text chunks
+            split_doc = []  # Initialize list to store text chunks
             # Define text splitter
             text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
                 chunk_size=int(os.environ.get('chunk_size', 1000)),  # Get chunk size from environment variables
                 chunk_overlap=int(os.environ.get('chunk_overlap', 100))  # Get chunk overlap from environment variables
             )           
-                        
             # Loop through each document
             for doc in docs:           
                 content = text_splitter.split_text(text=self.remove_html_tags(doc.page_content))  # Split text into chunks and add to list
-                # print(f'content: {content}')
-                chunks += content
-                
-            return chunks  # Return text chunks
+                split_doc += text_splitter.create_documents(content)  # Split text into chunks and add to list
+                      
+            return split_doc  # Return text chunks
         except Exception as e:
             # Handle exception if text extraction fails
             st.write(f"Error occurred while extracting text: {str(e)}")

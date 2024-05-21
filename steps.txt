@@ -39,7 +39,8 @@
 #pip install tiktoken==0.6.0
 #pip install openai
 #pip install swig
-#pip install faiss-cpu
+#pip install chromadb==0.5.0
+#pip install langchainhub
 
 # 5. create .env file on root 
 # add following keys with value
@@ -56,15 +57,8 @@
 # related_doc_count=3
 
 # # Vector store directories
-# faiss_vector_store_directory='./vector_db/faiss/'
 # chroma_vector_store_directory='./vector_db/chroma/'
 # upload_file_directory='./data/'
-
-# # Vector store type (0 for FAISS, 1 for Chroma)
-# vector_store=1
-
-# # Chain type (0 for qa_chain, 1 for conversational_retrieval_chain)
-# chain_type=1
 
 # # LangSmith tracing settings
 # LANGCHAIN_TRACING_V2=true
