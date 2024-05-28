@@ -32,22 +32,23 @@
 #pip install streamlit-extras
 #pip install python-dotenv
 #pip install pdfminer.six
-#pip install langchain==0.1.6
-#pip install langchain-community==0.0.19
-#pip install langchain-openai==0.0.6
+#pip install langchain
+#pip install langchain-community
+#pip install langchain-openai
 #pip install langchain_chroma
-#pip install tiktoken==0.6.0
+#pip install tiktoken
 #pip install openai
 #pip install swig
 #pip install chromadb==0.5.0
 #pip install langchainhub
+#pip install trulens_eval
 
 # 5. create .env file on root 
 # add following keys with value
 # # OpenAI API settings
 # OPENAI_API_KEY=
 # OPENAI_API_EMBEGGING_MODEL=text-embedding-3-large
-# OPENAI_API_GPT_MODEL=GPT-4o
+# OPENAI_API_GPT_MODEL=gpt-4o
 
 # # Chunk settings
 # chunk_size=2000
@@ -56,6 +57,9 @@
 # # related document from vector db
 # related_doc_count=3
 
+# # max token size for ConversationalRetrievalChain 
+# conversational_retrieval_chain_max_token=4095
+
 # # Vector store directories
 # chroma_vector_store_directory='./vector_db/chroma/'
 # upload_file_directory='./data/'
@@ -63,8 +67,12 @@
 # # LangSmith tracing settings
 # LANGCHAIN_TRACING_V2=true
 # LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
-# LANGCHAIN_API_KEY=
+# LANGCHAIN_API_KEY=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
 # LANGCHAIN_PROJECT=langsmit_SAG_Documentation_RAG
+
+# #TruLens app settings
+# truLens_app_id=trueLens_SAG_Documentation_RAG
+# generate_eval=True
 
 # 6. run app
 #streamlit run .\src\app.py

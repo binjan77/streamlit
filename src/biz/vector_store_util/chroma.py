@@ -6,7 +6,7 @@ import streamlit as st  # For displaying messages in Streamlit
 
 # Directory for storing Chroma vector data
 __chroma_vector_store_directory = os.environ.get('chroma_vector_store_directory')
-__embedding_model = os.environ["OPENAI_API_EMBEGGING_MODEL"]
+__embedding_model = os.environ.get("OPENAI_API_EMBEGGING_MODEL")
 
 def save_chroma_vector_db(store_name: str, docs) -> bool:
     """
@@ -48,6 +48,7 @@ def save_chroma_vector_db(store_name: str, docs) -> bool:
         
     return result 
 
+@st.cache_resource
 def get_chroma_vector_db():
     """
     Load the Chroma vector database.
@@ -65,7 +66,9 @@ def get_chroma_vector_db():
             # if more files found then only it takes the 1st item from the list
             # create context from the given collection
             if dir_files and len(dir_files) >= 1:  
-                print(">>> Move vector store files found.")
+                # if more CHROMA db files found
+                if len(dir_files) > 1:
+                    print(">>> More vector store files found.")
                 # Load the Chroma vector database
                 # instantiate embedding object
                 openai_embeddings = OpenAIEmbeddings(model=__embedding_model)
@@ -86,3 +89,16 @@ def get_chroma_vector_db():
         # Handle other unexpected exceptions
         print(f">>> vector.py > get_chroma_vector_db: An unexpected error occurred: {e}")
         return False
+
+@st.cache_resource
+def get_chroma_db_as_retriever ():
+    # Fetch the vector database
+    vector_db = get_chroma_vector_db()
+    
+    # Configure the retriever to search for similar documents with a specific number of results
+    vector_db_retriever = vector_db.as_retriever(
+        search_type="similarity",
+        search_kwargs={ "k": int(os.environ.get("related_doc_count")) }
+    )
+
+    return vector_db_retriever

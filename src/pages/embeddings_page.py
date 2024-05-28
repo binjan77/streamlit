@@ -1,5 +1,5 @@
-from biz.supported_doc_type.pdf import pdf_doc
-from biz.supported_doc_type.sitemap import sitemap_doc
+from biz.supported_doc_type.pdf import PDFDoc
+from biz.supported_doc_type.sitemap import SitemapDoc
 
 from widget.st_sidebar import sidebar
 
@@ -15,7 +15,7 @@ def generate_store():
     # If PDF files are uploaded
     if pdfs is not None:
         # Generate embeddings for PDFs
-        obj_pdf = pdf_doc('pdf')
+        obj_pdf = PDFDoc('pdf')
         success = obj_pdf.generate_store_from_pdfs(pdfs)
         # Check if embeddings are generated successfully
         if success:
@@ -26,7 +26,7 @@ def generate_store():
     # If a sitemap URL is entered
     if input_sitemap !=  "":
         # Generate embeddings for the sitemap
-        obj_sitemap = sitemap_doc('sitemap')
+        obj_sitemap = SitemapDoc('sitemap')
         success = obj_sitemap.generate_store_from_sitemap(input_sitemap)
         # Check if embeddings are generated successfully
         if success:

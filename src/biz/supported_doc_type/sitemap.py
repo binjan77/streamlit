@@ -10,7 +10,7 @@ from biz.vector_store_util.util import vector_store_exists  # Import function to
 import streamlit as st  # Import Streamlit for creating interactive web apps
 import os  # Import os module for file and directory operations
 
-class sitemap_doc:    
+class SitemapDoc:    
     # Instance attribute 
     def __init__(self, name): 
         self.name = name  # Initialize sitemap document name 

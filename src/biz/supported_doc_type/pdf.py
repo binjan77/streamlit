@@ -11,12 +11,12 @@ import streamlit as st  # Import Streamlit for creating interactive web apps
 import os  # Import os module for file and directory operations
 
 # Define a class for handling PDF documents
-class pdf_doc:
+class PDFDoc:
     # Constructor to initialize instance attributes
     def __init__(self, name: str):
         self.name = name  # Initialize PDF document name
         # Set upload directory path
-        self.__directory = os.environ["upload_file_directory"]
+        self.__directory = os.environ.get("upload_file_directory")
 
     # Method to generate embeddings and store them from PDFs
     def generate_store_from_pdfs(self, pdfs):
