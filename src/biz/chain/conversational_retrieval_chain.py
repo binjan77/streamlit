@@ -13,7 +13,7 @@ import streamlit as st
 chat_history = []
 
 # Define a function to search for similarities based on the user's query
-def search_similarities(prompt, vector_db_retriever, generate_eval):
+def search_similarities(question, vector_db_retriever, generate_eval):
     try:
         # Retrieve necessary environment variables
         openai_api_key = os.environ.get('OPENAI_API_KEY')
@@ -42,28 +42,32 @@ def search_similarities(prompt, vector_db_retriever, generate_eval):
             combine_docs_chain_kwargs={'prompt': ConversationalRetrievalChain_PROMPT}
         )
         
-        # Get the response from the conversational retrieval chain
-        conversational_retrieval_chain_response = conversational_retrieval_chain(
-            {"question": prompt, "chat_history": chat_history}
-        )
+        # Update the chat history with the new human message
+        chat_history.append(HumanMessage(content=question))
         
-        if generate_eval:
+        if generate_eval:            
             # Initialize evaluation utility if generate_eval is True
             trulens_eval_util = TrulensEvalUtil(
                 app_id=truLens_app_id,
                 rag_chain=conversational_retrieval_chain
             )
             # Perform evaluation of the prompt and chat history
-            trulens_eval_util.do_evaluation(prompt, chat_history)
+            tru_response, tru_record = trulens_eval_util.do_evaluation(question, chat_history)        
         
-        # Update the chat history with the new human message
-        chat_history.append(HumanMessage(content=prompt))
-        
-        # Update the chat history with the new AI message
-        chat_history.append(AIMessage(content=conversational_retrieval_chain_response["answer"]))
-        
-        # Return the AI response
-        return conversational_retrieval_chain_response["answer"]
+            # Update the chat history with the new AI message
+            chat_history.append(AIMessage(content=tru_response["answer"]))
+            # Return the AI response
+            return tru_response["answer"]            
+        else:            
+            # Get the response from the conversational retrieval chain
+            conversational_retrieval_chain_response = conversational_retrieval_chain.invoke(
+                {"question": question, "chat_history": chat_history}
+            )
+            
+            # Update the chat history with the new AI message
+            chat_history.append(AIMessage(content=conversational_retrieval_chain_response["answer"]))
+            # Return the AI response
+            return conversational_retrieval_chain_response["answer"]
     except Exception as e:
         # Handle exceptions and display an error message in the Streamlit app
         st.write(f"Error occurred while finding query similarities: {str(e)}")

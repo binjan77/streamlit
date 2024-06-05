@@ -21,7 +21,7 @@ __chroma_vector_store_directory = os.environ.get('chroma_vector_store_directory'
 __embedding_model = os.environ.get("OPENAI_API_EMBEDDING_MODEL")
 
 # Define a function to search for similarities based on the user's query
-def search_similarities(prompt, vector_db_retriever):
+def search_similarities(question, vector_db_retriever):
     """
     Search for similarities based on the user's query and generate a response.
 
@@ -67,12 +67,12 @@ def search_similarities(prompt, vector_db_retriever):
             # Invoke the retrieval chain with the chat history and user input
             response = retrieval_chain.invoke({
                 "chat_history": chat_history,
-                "input": prompt,  # Required for HISTORY_AWARE_RETRIEVER_CHAIN_PROMPT
+                "input": question,  # Required for HISTORY_AWARE_RETRIEVER_CHAIN_PROMPT
             })
             print(cb)  # Printing callback information
         
         # Update the chat history with the new human message
-        chat_history.append(HumanMessage(content=prompt))
+        chat_history.append(HumanMessage(content=question))
         
         # Update the chat history with the new AI message
         chat_history.append(AIMessage(content=response["answer"]))

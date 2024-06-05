@@ -42,6 +42,7 @@
 #pip install chromadb==0.5.0
 #pip install langchainhub
 #pip install trulens_eval
+#pip install flashrank
 
 # 5. create .env file on root 
 # add following keys with value
@@ -49,13 +50,18 @@
 # OPENAI_API_KEY=
 # OPENAI_API_EMBEGGING_MODEL=text-embedding-3-large
 # OPENAI_API_GPT_MODEL=gpt-4o
+# chain_temerature=0.2
 
 # # Chunk settings
 # chunk_size=2000
 # chunk_overlap=200
 
-# # related document from vector db
-# related_doc_count=3
+# # related document from vector db 
+# # Note: Keep related_doc_count=20 if rerank_doc=True, else related_doc_count=3
+# related_doc_count=20
+# # rerank doc settings
+# # Note: rerank_doc=True only if generate_eval=False (System gives error "Found more than one BaseRetriever")
+# rerank_doc=True
 
 # # max token size for ConversationalRetrievalChain 
 # conversational_retrieval_chain_max_token=4095
@@ -67,12 +73,13 @@
 # # LangSmith tracing settings
 # LANGCHAIN_TRACING_V2=true
 # LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
-# LANGCHAIN_API_KEY=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
+# LANGCHAIN_API_KEY=
 # LANGCHAIN_PROJECT=langsmit_SAG_Documentation_RAG
 
 # #TruLens app settings
-# truLens_app_id=trueLens_SAG_Documentation_RAG
-# generate_eval=True
+# truLens_app_id=trueLens_RAG
+# generate_eval=False
+
 
 # 6. run app
 #streamlit run .\src\app.py

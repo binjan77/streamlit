@@ -30,22 +30,25 @@ def question_answer():
     """
     display_qna()
     
-    if prompt :=  st.chat_input("Enter text here"):
+    if question :=  st.chat_input("Enter text here"):
         try:
-            st.chat_message("user").markdown(prompt)
-            st.session_state.question_answer.append({"role": "user", "content": prompt})
+            st.chat_message("user").markdown(question)
+            st.session_state.question_answer.append({"role": "user", "content": question})
+            
+            # set value based on environment variable
+            generate_eval =  True if os.environ.get("generate_eval")=="True" else False
+            rerank_doc =  True if os.environ.get("rerank_doc")=="True" else False
             
             # # find similarities (create_retrieval_chain)
             # response = create_retrieval_chain_search_similarities(
             #     prompt, 
-            #     get_chroma_db_as_retriever()
+            #     get_chroma_db_as_retriever(rerank_doc)
             # ) 
             
             # find similarities (conversational retrieval chain)
-            generate_eval =  True if os.environ.get("generate_eval")=="True" else False
             response = conversational_retrieval_chain_search_similarities(
-                prompt=prompt, 
-                vector_db_retriever=get_chroma_db_as_retriever(),
+                question=question, 
+                vector_db_retriever=get_chroma_db_as_retriever(rerank_doc),
                 generate_eval=generate_eval
             )           
              

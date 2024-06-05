@@ -1,5 +1,7 @@
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
+from langchain.retrievers.document_compressors import FlashrankRerank
+from langchain.retrievers import ContextualCompressionRetriever
 
 import os  # For interacting with the file system
 import streamlit as st  # For displaying messages in Streamlit
@@ -91,7 +93,7 @@ def get_chroma_vector_db():
         return False
 
 @st.cache_resource
-def get_chroma_db_as_retriever ():
+def get_chroma_db_as_retriever(rerank_doc):
     # Fetch the vector database
     vector_db = get_chroma_vector_db()
     
@@ -100,5 +102,13 @@ def get_chroma_db_as_retriever ():
         search_type="similarity",
         search_kwargs={ "k": int(os.environ.get("related_doc_count")) }
     )
+    
+    if rerank_doc:
+        compressor = FlashrankRerank()
+        compression_retriever = ContextualCompressionRetriever(
+            base_compressor=compressor, base_retriever=vector_db_retriever
+        )
+
+        return compression_retriever
 
     return vector_db_retriever

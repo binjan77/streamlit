@@ -29,19 +29,19 @@ class TrulensEvalUtil:
                 feedbacks=[self.f_answer_relevance, self.f_context_relevance, self.f_groundedness]
             )
 
-    def do_evaluation(self, prompt, chat_history):
+    def do_evaluation(self, question, chat_history):
         """
         Evaluate the given prompt and chat history using the TruChain recorder.
         
         Parameters:
-        prompt (str): The input question or prompt to evaluate.
+        question (str): The input question or prompt to evaluate.
         chat_history (list): The chat history related to the prompt.
         
         Returns:
         tuple: The response from the RAG chain and the evaluation record.
         """
         try:
-            tru_response, tru_record = self.tru_recorder.with_record(self.rag_chain.invoke, {"question": prompt, "chat_history": chat_history})
+            tru_response, tru_record = self.tru_recorder.with_record(self.rag_chain.invoke, {"question": question, "chat_history": chat_history})
             tru_record.wait_for_feedback_results()
             return tru_response, tru_record
         except Exception as e:
