@@ -7,7 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.callbacks import get_openai_callback
 
 # Import utility function for getting the vector database and prompts
-from biz.prompt.prompt import DOCUMENT_CHAIN_PROMT, HISTORY_AWARE_RETRIEVER_CHAIN_PROMPT
+from util_langchain.prompt.prompt import DOCUMENT_CHAIN_PROMT, HISTORY_AWARE_RETRIEVER_CHAIN_PROMPT
 
 # Import operating system functionality and Streamlit for web applications
 import os

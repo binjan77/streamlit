@@ -1,4 +1,4 @@
-from biz.vector_store_util.chroma import get_chroma_vector_db
+from biz.util_vector_store.chroma import get_chroma_vector_db
 
 import os
 

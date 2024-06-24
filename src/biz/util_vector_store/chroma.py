@@ -92,17 +92,19 @@ def get_chroma_vector_db():
         print(f">>> vector.py > get_chroma_vector_db: An unexpected error occurred: {e}")
         return False
 
+###############################################################
+# Fetch the vector database
+vector_db = get_chroma_vector_db()
+
+# Configure the retriever to search for similar documents with a specific number of results
+vector_db_retriever = vector_db.as_retriever(
+    search_type="similarity",
+    search_kwargs={ "k": int(os.environ.get("related_doc_count")) }
+)
+###############################################################
+
 @st.cache_resource
-def get_chroma_db_as_retriever(rerank_doc):
-    # Fetch the vector database
-    vector_db = get_chroma_vector_db()
-    
-    # Configure the retriever to search for similar documents with a specific number of results
-    vector_db_retriever = vector_db.as_retriever(
-        search_type="similarity",
-        search_kwargs={ "k": int(os.environ.get("related_doc_count")) }
-    )
-    
+def get_chroma_db_as_retriever(rerank_doc):    
     if rerank_doc:
         compressor = FlashrankRerank()
         compression_retriever = ContextualCompressionRetriever(

@@ -2,6 +2,7 @@
 /.venv
 /data
 /vector_db
+/chat_history
 **/__pycache__
 .env
 default.sqlite

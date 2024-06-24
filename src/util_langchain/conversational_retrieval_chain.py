@@ -3,8 +3,8 @@ from langchain_openai.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain_core.messages import HumanMessage, AIMessage
 
-from biz.eval.trulens_eval_util import TrulensEvalUtil
-from biz.prompt.prompt import ConversationalRetrievalChain_PROMPT
+from util_trulens_eval.util_trulens_eval import TrulensEvalUtil
+from util_langchain.prompt.prompt import ConversationalRetrievalChain_PROMPT
 
 import os  # for getting API token from env variable OPENAI_API_KEY
 import streamlit as st

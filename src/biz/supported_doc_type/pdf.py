@@ -1,11 +1,10 @@
 # Import necessary modules and packages
-from langchain.text_splitter import RecursiveCharacterTextSplitter  # Import text splitter module for text extraction
 from langchain_community.document_loaders import PDFMinerLoader  # Import PDF loader module for PDF processing
 
 # Import local class file
-from biz.vector_store_util.chroma import save_chroma_vector_db  # Import function to save embeddings to Chroma vector database
-from biz.vector_store_util.util import vector_store_exists  # Import function to check whether the vector store exists
+from biz.util.util import vector_store_exists  # Import function to check whether the vector store exists
 from biz.util.upload_file import upload_file  # Import function to upload files
+from biz.util_vector_store.chroma import save_chroma_vector_db  # Import function to save embeddings to Chroma vector database
 
 import streamlit as st  # Import Streamlit for creating interactive web apps
 import os  # Import os module for file and directory operations
@@ -19,7 +18,8 @@ class PDFDoc:
         self.__directory = os.environ.get("upload_file_directory")
 
     # Method to generate embeddings and store them from PDFs
-    def generate_store_from_pdfs(self, pdfs):
+    def generate_store_from_pdfs(self, pdfs) -> bool:
+        result = False         
         # Check if PDFs are provided
         if pdfs is not None:
             # Check if the upload directory exists, if not, create it
@@ -40,25 +40,26 @@ class PDFDoc:
                         # Check if provided PDF is converted into doc
                         if pdf_doc:                            
                             # Save embeddings to the Chroma vector database
-                            save_chroma_vector_db(store_name, pdf_doc)
-                            return True 
+                            result = save_chroma_vector_db(store_name, pdf_doc)
                         else:
                             # Return False if text extraction fails
                             st.write("Text extraction failed for PDF:", pdf.name)
-                            return False
+                            result = False
                         # Return True if the process completes successfully
                         return True
                     else:
                         # Return False if file upload fails
                         st.write("File upload failed for PDF:", pdf.name)
-                        return False 
+                        result = False 
                 else:
                     # Return False if the PDF's CHROMA DB already exists
                     st.write(f"PDF: {pdf.name}, CHROMA DB already exists.")
                     return False
         else:
             # Return False if no PDFs are provided
-            return False
+            result = False
+            
+        return result
 
     # Method to generate store name based on PDF name and selected store type
     def get_store_name(self, pdf_name: str):

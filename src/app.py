@@ -1,5 +1,6 @@
 from dotenv import load_dotenv  # Importing the load_dotenv function from the dotenv module
 
+import os
 import streamlit as st  # Importing the Streamlit library
 
 from widget.st_sidebar import sidebar  # Importing the sidebar function from the st_sidebar module in the widget package
@@ -13,5 +14,11 @@ def main():
     # Displaying a markdown message introducing the internal chatbot app for Software AG employees
     st.markdown("**Introducing our internal chatbot app designed specifically for Software AG employees! This smart assistant is your go-to for quick answers, IT support, and company information. Powered by AI, it streamlines communication, boosts productivity, and enhances employee experience within the organization.**")
 
+    # set process id variable in environement
+    os.environ["pid"] = str(os.getpid)
+    # set langsmith project name
+    os.environ["LANGCHAIN_PROJECT"] = f"{os.environ["LANGCHAIN_PROJECT"]}_{os.getpid}"
+
+    
 if __name__ == '__main__':
     main()  # Calling the main function if the script is executed as the main program

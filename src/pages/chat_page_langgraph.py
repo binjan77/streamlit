@@ -1,5 +1,8 @@
-# from biz.chain.create_retrieval_chain import search_similarities as create_retrieval_chain_search_similarities
+# from util_langchain.create_retrieval_chain import search_similarities as create_retrieval_chain_search_similarities
 from util_langchain.conversational_retrieval_chain import search_similarities as conversational_retrieval_chain_search_similarities
+
+from util_langgraph.main import get_response
+
 from biz.util.util import vector_store_dir_exists
 from biz.util_vector_store.chroma import get_chroma_db_as_retriever
 
@@ -11,7 +14,6 @@ import os
 # Initialize the chat history if it doesn't exist
 if 'question_answer' not in st.session_state:
     st.session_state['question_answer'] = [{"role": "system", "content": "You are a helpful assistant, please get me related information to the query I have posted."}]
-
 
 # Display the chat history
 def display_qna():    
@@ -29,10 +31,6 @@ def question_answer():
     Allow users to input questions and get answers.
     """
     display_qna()
-    
-    # set value based on environment variable
-    generate_eval =  True if os.environ.get("generate_eval")=="True" else False
-    rerank_doc =  True if os.environ.get("rerank_doc")=="True" else False
     
     questions = ["What is a sensor app?",
                 "What permission level for CEP management permission type do I need to use Analytics Builder?",
@@ -63,48 +61,32 @@ def question_answer():
     for question in questions:
         try:
             st.chat_message("user").markdown(question)
-            st.session_state.question_answer.append({"role": "user", "content": question}) 
-        
+            st.session_state.question_answer.append({"role": "user", "content": question})
+                        
             # find similarities (conversational retrieval chain)
-            response = conversational_retrieval_chain_search_similarities(
-                question=question, 
-                vector_db_retriever=get_chroma_db_as_retriever(rerank_doc),
-                generate_eval=generate_eval
-            )           
-                
+            response = get_response({"question": question})
+             
             st.chat_message("assistant").markdown(response)
-            st.session_state.question_answer.append({"role": "assistant", "content": response})    
+            st.session_state.question_answer.append({"role": "assistant", "content": response})           
         except Exception as e:
             # Handle exception if sitemap loading fails
             st.write(f"Error occurred while question prompt: {str(e)}")
-            return False 
-    
-    # if prompt :=  st.chat_input("Enter text here"):
+            return False  
+        
+    # if question :=  st.chat_input("Enter text here"):
     #     try:
-    #         st.chat_message("user").markdown(prompt)
-    #         st.session_state.question_answer.append({"role": "user", "content": prompt})
-            
-    #         # # find similarities (create_retrieval_chain)
-    #         # response = create_retrieval_chain_search_similarities(
-    #         #     prompt, 
-    #         #     get_chroma_db_as_retriever(rerank_doc)
-    #         # ) 
-            
+    #         st.chat_message("user").markdown(question)
+    #         st.session_state.question_answer.append({"role": "user", "content": question})
+                        
     #         # find similarities (conversational retrieval chain)
-    #         generate_eval =  True if os.environ.get("generate_eval")=="True" else False
-    #         response = conversational_retrieval_chain_search_similarities(
-    #             prompt=prompt, 
-    #             vector_db_retriever=get_chroma_db_as_retriever(rerank_doc),
-    #             generate_eval=generate_eval
-    #         )           
+    #         response = get_response({"question": question})
              
     #         st.chat_message("assistant").markdown(response)
     #         st.session_state.question_answer.append({"role": "assistant", "content": response})           
     #     except Exception as e:
     #         # Handle exception if sitemap loading fails
     #         st.write(f"Error occurred while question prompt: {str(e)}")
-    #         return False  
-        
+    #         return False          
 def main():
     """
     Main function to setup UI and start the chatbot application.

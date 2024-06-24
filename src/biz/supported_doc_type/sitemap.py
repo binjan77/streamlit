@@ -4,8 +4,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter  # Import tex
 from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
 
 # Import local class file
-from biz.vector_store_util.chroma import save_chroma_vector_db  # Import function to save embeddings to Chroma vector database
-from biz.vector_store_util.util import vector_store_exists  # Import function to check if store exists
+from biz.util_vector_store.chroma import save_chroma_vector_db  # Import function to save embeddings to Chroma vector database
+from biz.util.util import vector_store_exists  # Import function to check if store exists
 
 import streamlit as st  # Import Streamlit for creating interactive web apps
 import os  # Import os module for file and directory operations

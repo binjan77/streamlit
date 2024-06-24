@@ -12,3 +12,5 @@ swig
 chromadb==0.5.0
 langchainhub
 trulens_eval
+flashrank
+langgraph
